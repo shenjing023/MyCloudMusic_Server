@@ -153,9 +153,22 @@ class Lyric(Resource):
         return jsonify(result)
 
 
+class FM(Resource):
+    """
+    网易云音乐私人FM
+    """
+    def __init__(self):
+        super().__init__()
+
+    def get(self):
+        result=netease.person_fm()
+        return jsonify(result)
+
+
 api.add_resource(Search,'/search')
 api.add_resource(Playlists,'/playlists')
 api.add_resource(PlaylistDetail,'/playlist/detail')
 api.add_resource(SongUrl,'/music/url')
 api.add_resource(Lyric,'/lyric')
+api.add_resource(FM,"/fm")
     
