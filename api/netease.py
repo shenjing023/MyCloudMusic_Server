@@ -160,7 +160,16 @@ class NetEase():
         )
         try:
             data=self.http_request('GET',url,timeout=DEFAULT_TIMEOUT)
-            return data['playlists']
+            # 解析
+            result=[]
+            for item in data['playlists']:
+                d={
+                    'collect_name':item['name'],
+                    'list_id':item['id'],
+                    'logo':item['coverImgUrl']
+                }
+                result.append(d)
+            return result
         except error.HTTPError as e:
             logger.error(e)
             return []
