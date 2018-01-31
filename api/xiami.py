@@ -86,24 +86,35 @@ class Xiami():
 
     def playlists(self,page=1,limit=60):
         """
-        歌单
+        歌单          
         """
         url='http://api.xiami.com/web?v=2.0&app_key=1&_ksTS=1459927525542_91' + \
             '&page={}&limit={}&callback=jsonp92&r=collect/recommend'.format(page,limit)
         response=self.raw_http_request('GET',url)
         response= json.loads(response[len('jsonp92('):-len(')')])
-        return response
+        return response['data']
 
 
     def playlists_detail(self,playlist_id):
         """
-        歌单详情
+        歌单详情,返回音乐标题，歌手，专辑，音乐id，音乐图片url
         """
         url = 'http://api.xiami.com/web?v=2.0&app_key=1&id={}'.format(playlist_id) + \
             '&_ksTS=1459928471147_121&callback=jsonp122&r=collect/detail'
         response=self.raw_http_request('GET',url)
         response = json.loads(response[len('jsonp122('):-len(')')])
-        return response
+        # 解析
+        songs=[]
+        for item in response['data']['songs']:
+            song={
+                'song_name':item['song_name'],
+                'singers':item['singers'],
+                'album_name':item['album_name'],
+                'song_id':item['song_id'],
+                'pic_url':item['album_logo']
+            }
+            songs.append(song)
+        return songs
 
 
     def song_url(self,song_id):

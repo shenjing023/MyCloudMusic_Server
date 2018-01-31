@@ -177,7 +177,7 @@ class NetEase():
 
     def playlist_detail(self,playlist_id):
         """
-        根据歌单id获取歌单详情
+        根据歌单id获取歌单详情，返回音乐标题，歌手，专辑，音乐id，音乐图片url
         使用新版本v3接口，
         借鉴自https://github.com/Binaryify/NeteaseCloudMusicApi/commit/a1239a838c97367e86e2ec3cdce5557f1aa47bc1
         """
@@ -191,8 +191,32 @@ class NetEase():
             'offset':0
         }
         data=_encrypted_request(data)
-        result=self.http_request('POST',url,data,timeout=DEFAULT_TIMEOUT)
-        return result['playlist']['tracks']
+        response=self.http_request('POST',url,data,timeout=DEFAULT_TIMEOUT)
+        # 解析
+        songs=[]
+        for item in response['playlist']['tracks']:
+            song_name=item['name']  # 音乐名称
+            # 歌手
+            for singer in item['ar']:
+                singers=singer['name']
+                singers+='/'
+            singers=singers[:-1]
+            # 专辑,图片url
+            album=item['al']['name']
+            pic_url=item['al']['picUrl']
+            # 歌曲id
+            song_id=item['id']
+
+            song={
+                'song_name':song_name,
+                'singers':singers,
+                'album_name':album,
+                'song_id':song_id,
+                'pic_url':pic_url
+            }
+            songs.append(song)
+
+        return songs
 
 
     def song_url(self,song_id,bit_rate=320000):
