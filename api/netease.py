@@ -177,7 +177,8 @@ class NetEase():
 
     def playlist_detail(self,playlist_id):
         """
-        根据歌单id获取歌单详情，返回音乐标题，歌手，专辑，音乐id，音乐图片url
+        根据歌单id获取歌单详情，返回歌单名称，歌单图片url，歌单作者，歌曲总数，歌单播放数，分享总数，
+        收藏总数，还有每首歌的歌名，歌手，专辑，音乐id
         使用新版本v3接口，
         借鉴自https://github.com/Binaryify/NeteaseCloudMusicApi/commit/a1239a838c97367e86e2ec3cdce5557f1aa47bc1
         """
@@ -193,6 +194,14 @@ class NetEase():
         data=_encrypted_request(data)
         response=self.http_request('POST',url,data,timeout=DEFAULT_TIMEOUT)
         # 解析
+        playlist_name=response['playlist']['name']
+        playlist_pic=response['playlist']['coverImgUrl']
+        playlist_user=response['playlist']['creator']['nickname']
+        playlist_songs_count=response['playlist']['trackCount']
+        playlist_play_count=response['playlist']['playCount']
+        playlist_share_count=response['playlist']['shareCount']
+        playlist_favorite_count=response['playlist']['subscribedCount']
+        # 每首歌信息
         songs=[]
         for item in response['playlist']['tracks']:
             song_name=item['name']  # 音乐名称
@@ -211,12 +220,21 @@ class NetEase():
                 'song_name':song_name,
                 'singers':singers,
                 'album_name':album,
-                'song_id':song_id,
-                'pic_url':pic_url
+                'song_id':song_id
             }
             songs.append(song)
-
-        return songs
+        
+        data={
+            'name':playlist_name,
+            'pic':playlist_pic,
+            'user':playlist_user,
+            'songs_count':playlist_songs_count,
+            'play_count':playlist_play_count,
+            'share_count':playlist_share_count,
+            'favorite_count':playlist_favorite_count,
+            'songs':songs
+        }
+        return data
 
 
     def song_url(self,song_id,bit_rate=320000):

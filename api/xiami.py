@@ -97,24 +97,43 @@ class Xiami():
 
     def playlists_detail(self,playlist_id):
         """
-        歌单详情,返回音乐标题，歌手，专辑，音乐id，音乐图片url
+        歌单详情,返回歌单名称，歌单图片url，歌单作者，歌曲总数，歌单播放数，分享总数，
+        收藏总数，还有每首歌的歌名，歌手，专辑，音乐id
         """
         url = 'http://api.xiami.com/web?v=2.0&app_key=1&id={}'.format(playlist_id) + \
             '&_ksTS=1459928471147_121&callback=jsonp122&r=collect/detail'
         response=self.raw_http_request('GET',url)
         response = json.loads(response[len('jsonp122('):-len(')')])
         # 解析
+        playlist_name=response['data']['collect_name']  #歌单名称
+        playlist_pic=response['data']['logo']   #歌单图片url
+        playlist_user=response['data']['user_name'] #作者
+        playlist_songs_count=response['data']['songs_count']  #歌曲总数
+        playlist_play_count=response['data']['play_count']  #播放总数
+        playlist_share_count=response['data']['recommends'] #分享总数
+        playlist_favorite_count=response['data']['favorites']   #收藏总数
+        # 每首歌的信息
         songs=[]
         for item in response['data']['songs']:
             song={
                 'song_name':item['song_name'],
                 'singers':item['singers'],
                 'album_name':item['album_name'],
-                'song_id':item['song_id'],
-                'pic_url':item['album_logo']
+                'song_id':item['song_id']
             }
             songs.append(song)
-        return songs
+        
+        data={
+            'name':playlist_name,
+            'pic':playlist_pic,
+            'user':playlist_user,
+            'songs_count':playlist_songs_count,
+            'play_count':playlist_play_count,
+            'share_count':playlist_share_count,
+            'favorite_count':playlist_favorite_count,
+            'songs':songs
+        }
+        return data
 
 
     def song_url(self,song_id):
