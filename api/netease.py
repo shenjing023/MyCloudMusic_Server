@@ -215,16 +215,21 @@ class NetEase():
             pic_url=item['al']['picUrl']
             # 歌曲id
             song_id=item['id']
+            # 歌曲长度
+            song_length=item['dt']//1000
 
             song={
                 'song_name':song_name,
                 'singers':singers,
                 'album_name':album,
-                'song_id':song_id
+                'song_id':song_id,
+                'pic_url':pic_url,
+                'song_length':song_length
             }
             songs.append(song)
         
         data={
+            'type':'netease',
             'name':playlist_name,
             'pic':playlist_pic,
             'user':playlist_user,
@@ -242,14 +247,18 @@ class NetEase():
         根据歌曲id获取歌曲url
         """
         url='http://music.163.com/weapi/song/enhance/player/url?csrf_token='
-        data={
+        param={
             'ids':[song_id],
             'br':bit_rate,
             'csrf_token':''
         }
-        data=_encrypted_request(data)
-        result=self.http_request('POST',url,data,timeout=DEFAULT_TIMEOUT)
-        return result['data'][0]
+        param=_encrypted_request(param)
+        response=self.http_request('POST',url,param,timeout=DEFAULT_TIMEOUT)
+        
+        data={
+            'song_url':response['data'][0]['url']
+        }
+        return data
 
 
     def album(self,album_id):

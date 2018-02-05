@@ -119,11 +119,14 @@ class Xiami():
                 'song_name':item['song_name'],
                 'singers':item['singers'],
                 'album_name':item['album_name'],
-                'song_id':item['song_id']
+                'song_id':item['song_id'],
+                'pic_url':item['album_logo'],
+                'song_length':item['length']
             }
             songs.append(song)
         
         data={
+            'type':'xiami',
             'name':playlist_name,
             'pic':playlist_pic,
             'user':playlist_user,
@@ -143,8 +146,14 @@ class Xiami():
         url = 'http://www.xiami.com/song/playlist/id/{}'.format(song_id) + \
             '/object_name/default/object_id/0/cat/json'
         response=self.raw_http_request('GET',url)
-        result = json.loads(response)['data']['trackList'][0]['location']
-        return caesar(result)
+        response = json.loads(response)['data']['trackList'][0]
+
+        data={
+            'length':response['length'],
+            'lyric_url':response['lyric_url'],
+            'song_url':caesar(response['location'])
+        }
+        return data
 
 
     def lyric(self,song_id):
